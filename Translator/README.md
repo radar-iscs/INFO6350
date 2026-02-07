@@ -6,15 +6,15 @@ A simple translator Android app using Jetpack Compose.
 
 ```console
 cd server/
-python3 app.app
+python3 app.py
 ```
 
 ## Screenshot
 
 - Test with Application
-  
+
   ![App Screenshot](assets/app.png)
-  
+
 - Test with Postman
 
   ![App Screenshot](assets/postman.png)
