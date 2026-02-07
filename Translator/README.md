@@ -11,9 +11,13 @@ python3 app.py
 
 ## Screenshot
 
-- Test with Application
+- Test with Android Application
 
   ![App Screenshot](assets/app.png)
+
+- Test with Web Browser
+
+  ![App Screenshot](assets/website.png)
 
 - Test with Postman
 
