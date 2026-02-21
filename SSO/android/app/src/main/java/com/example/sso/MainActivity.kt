@@ -82,7 +82,7 @@ fun LoginScreen(onLoginSuccess: (String, String, String) -> Unit) {
                 coroutineScope.launch {
                     val credentialManager = CredentialManager.create(context)
 
-                    val webClientId = "51840671724-nlk5dtk5h24ofb7qvugg5jkcsm5b7gsn.apps.googleusercontent.com"
+                    val webClientId = BuildConfig.WEB_CLIENT_ID
 
                     val googleIdOption = GetGoogleIdOption.Builder()
                         .setFilterByAuthorizedAccounts(false)
