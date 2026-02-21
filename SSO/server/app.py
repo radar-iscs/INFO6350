@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify, render_template_string, redirect, url
 from googletrans import Translator
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 load_dotenv()
 
@@ -185,10 +187,35 @@ def logout():
 
 @app.route('/translate', methods=['POST'])
 async def translate_text():
-    # Protect the API route: Ensure only logged-in users can translate
-    if 'user' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
+    user_email = None
 
+    # 1. Check for Android Native Token (Bearer Token)
+    auth_header = request.headers.get('Authorization')
+    if auth_header and auth_header.startswith('Bearer '):
+        token = auth_header.split(' ')[1]
+        try:
+            # Verify the token. 
+            # IMPORTANT: The client ID here must match the WEB client ID 
+            # you used in your Android app to request the token.
+            idinfo = id_token.verify_oauth2_token(
+                token, 
+                google_requests.Request(), 
+                os.getenv("GOOGLE_CLIENT_ID")
+            )
+            user_email = idinfo.get('email')
+        except ValueError as e:
+            # Token is invalid or expired
+            return jsonify({'error': f'Invalid token: {str(e)}'}), 401
+
+    # 2. Fallback to Web Session (for your website users)
+    elif 'user' in session:
+        user_email = session['user']['email']
+
+    # 3. Reject if neither authentication method is valid
+    if not user_email:
+        return jsonify({'error': 'Unauthorized. Please log in.'}), 401
+
+    # Proceed with translation if authentication passed
     try:
         data = request.get_json(force=True)
         if not data or 'text' not in data:
@@ -199,7 +226,8 @@ async def translate_text():
         
         return jsonify({
             'original_text': text_to_translate,
-            'translated_text': result.text
+            'translated_text': result.text,
+            'user': user_email # Optional: just to prove auth worked
         })
 
     except Exception as e:
