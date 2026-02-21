@@ -10,7 +10,6 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# ---------------- SECURITY & OAUTH CONFIG ----------------
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback_secret_key_for_dev")
 
 app.config.update(
@@ -32,9 +31,6 @@ google = oauth.register(
 
 translator = Translator()
 
-# ---------------- HTML TEMPLATES ----------------
-
-# The main translator page, updated with user info and a logout button
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -150,17 +146,12 @@ LOGIN_PAGE = """
 </html>
 """
 
-# ---------------- ROUTES ----------------
-
 @app.route('/')
 def home():
-    # Check if user is logged in
     user = session.get('user')
     if not user:
-        # If not logged in, show the login button page
         return render_template_string(LOGIN_PAGE)
     
-    # If logged in, show the translator and pass the user info to the HTML
     return render_template_string(HTML_PAGE, user=user)
 
 @app.route('/login')
@@ -187,16 +178,14 @@ def logout():
 
 @app.route('/translate', methods=['POST'])
 async def translate_text():
+    print("HEADERS RECEIVED:", request.headers) 
+
     user_email = None
 
-    # 1. Check for Android Native Token (Bearer Token)
     auth_header = request.headers.get('Authorization')
     if auth_header and auth_header.startswith('Bearer '):
         token = auth_header.split(' ')[1]
         try:
-            # Verify the token. 
-            # IMPORTANT: The client ID here must match the WEB client ID 
-            # you used in your Android app to request the token.
             idinfo = id_token.verify_oauth2_token(
                 token, 
                 google_requests.Request(), 
@@ -204,18 +193,14 @@ async def translate_text():
             )
             user_email = idinfo.get('email')
         except ValueError as e:
-            # Token is invalid or expired
             return jsonify({'error': f'Invalid token: {str(e)}'}), 401
 
-    # 2. Fallback to Web Session (for your website users)
     elif 'user' in session:
         user_email = session['user']['email']
 
-    # 3. Reject if neither authentication method is valid
     if not user_email:
         return jsonify({'error': 'Unauthorized. Please log in.'}), 401
 
-    # Proceed with translation if authentication passed
     try:
         data = request.get_json(force=True)
         if not data or 'text' not in data:
@@ -227,7 +212,7 @@ async def translate_text():
         return jsonify({
             'original_text': text_to_translate,
             'translated_text': result.text,
-            'user': user_email # Optional: just to prove auth worked
+            'user': user_email
         })
 
     except Exception as e:

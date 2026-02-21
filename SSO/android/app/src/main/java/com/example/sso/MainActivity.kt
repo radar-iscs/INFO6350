@@ -29,8 +29,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 
-// 1. Create a data class to hold the logged-in user's information
-data class UserProfile(val name: String, val email: String)
+data class UserProfile(val name: String, val email: String, val idToken: String)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,14 +46,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainAppScreen() {
-    // 2. State hoisting: Track the user at the top level
     var currentUser by remember { mutableStateOf<UserProfile?>(null) }
 
-    // 3. Conditional navigation based on login state
     if (currentUser == null) {
         LoginScreen(
-            onLoginSuccess = { name, email ->
-                currentUser = UserProfile(name, email)
+            onLoginSuccess = { name, email, idToken ->
+                currentUser = UserProfile(name, email, idToken)
             }
         )
     } else {
@@ -66,8 +63,7 @@ fun MainAppScreen() {
 }
 
 @Composable
-fun LoginScreen(onLoginSuccess: (String, String) -> Unit) {
-    // We need the Context and a CoroutineScope to launch the login request
+fun LoginScreen(onLoginSuccess: (String, String, String) -> Unit) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -99,7 +95,6 @@ fun LoginScreen(onLoginSuccess: (String, String) -> Unit) {
                         .build()
 
                     try {
-                        // This triggers the Google Bottom Sheet UI!
                         val result = credentialManager.getCredential(
                             request = request,
                             context = context
@@ -107,19 +102,18 @@ fun LoginScreen(onLoginSuccess: (String, String) -> Unit) {
 
                         val credential = result.credential
 
-                        // Parse the result into a Google ID Token
                         if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                             try {
                                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
 
                                 val name = googleIdTokenCredential.displayName ?: "User"
                                 val email = googleIdTokenCredential.id
-                                val idToken = googleIdTokenCredential.idToken // <-- We will need this for Flask later!
+                                val idToken = googleIdTokenCredential.idToken
 
                                 Log.d("Auth", "Login Successful! Token: $idToken")
 
                                 // Pass the data to update the UI
-                                onLoginSuccess(name, email)
+                                onLoginSuccess(name, email, idToken)
 
                             } catch (e: GoogleIdTokenParsingException) {
                                 Log.e("Auth", "Received an invalid google id token response", e)
@@ -149,7 +143,6 @@ fun TranslatorScreen(user: UserProfile, onLogout: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        // 4. Add the User Profile Header and Logout Button
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -187,7 +180,7 @@ fun TranslatorScreen(user: UserProfile, onLogout: () -> Unit) {
                 if (inputText.isNotBlank()) {
                     isLoading = true
                     scope.launch {
-                        val translation = translateText(inputText)
+                        val translation = translateText(inputText, user.idToken)
                         resultText = translation
                         isLoading = false
                     }
@@ -234,7 +227,7 @@ fun TranslatorScreen(user: UserProfile, onLogout: () -> Unit) {
     }
 }
 
-suspend fun translateText(textToTranslate: String): String {
+suspend fun translateText(textToTranslate: String, idToken: String): String {
     val url = "http://10.0.2.2:5000/translate"
 
     return withContext(Dispatchers.IO) {
@@ -246,6 +239,7 @@ suspend fun translateText(textToTranslate: String): String {
 
             val request = Request.Builder()
                 .url(url)
+                .addHeader("Authorization", "Bearer $idToken")
                 .post(requestBody)
                 .build()
 
@@ -256,7 +250,6 @@ suspend fun translateText(textToTranslate: String): String {
                 val jsonResponse = JSONObject(responseData)
                 jsonResponse.getString("translated_text")
             } else if (response.code == 401) {
-                // 5. Catch the specific Unauthorized error from Flask
                 "Error: 401 Unauthorized. The Android app needs to send authentication data."
             } else {
                 "Server Error: ${response.code}"
