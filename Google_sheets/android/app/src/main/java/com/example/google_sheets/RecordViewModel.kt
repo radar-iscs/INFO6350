@@ -10,6 +10,7 @@ class RecordViewModel : ViewModel() {
         private set
 
     fun submitData(
+        idToken: String,
         firstName: String,
         lastName: String,
         timeIn: String,
@@ -20,8 +21,8 @@ class RecordViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val record = RecordData(firstName, lastName, timeIn, timeOut, notes)
-                val response = RetrofitClient.apiService.submitRecord(record)
-
+                val bearerToken = "Bearer $idToken"
+                val response = RetrofitClient.apiService.submitRecord(bearerToken, record)
                 if (response.isSuccessful) {
                     submissionStatus.value = "Success: ${response.body()?.message}"
                     onSuccess()

@@ -1,6 +1,6 @@
 # Google Sheets Submitter - Jetpack Compose
 
-A Google Sheets submitter Android app using Jetpack Compose.
+A Google Sheets submitter Android app using Jetpack Compose and SSO.
 
 ## How to run
 
@@ -13,12 +13,8 @@ python3 app.py
 
 - Test with Android Application
 
-  ![App Screenshot](assets/android.png)
+  ![App Screenshot](assets/android.gif)
 
 - Test with Web Browser
 
-  ![App Screenshot](assets/website.png)
-
-- The results
-
-  ![App Screenshot](assets/result.png)
+  ![App Screenshot](assets/web.gif)

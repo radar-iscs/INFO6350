@@ -5,16 +5,17 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Header
 
-// The API Interface
 interface ApiService {
     @POST("/api/record")
-    suspend fun submitRecord(@Body record: RecordData): Response<ApiResponse>
+    suspend fun submitRecord(
+        @Header("Authorization") token: String,
+        @Body record: RecordData
+    ): Response<ApiResponse>
 }
 
-// The Retrofit Singleton
 object RetrofitClient {
-    // 10.0.2.2 connects the Android Emulator to computer's localhost
     private const val BASE_URL = "http://10.0.2.2:5000"
 
     val apiService: ApiService by lazy {
