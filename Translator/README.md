@@ -1,4 +1,4 @@
-# Calculator - Jetpack Compose
+# Translator - Jetpack Compose
 
 A simple translator Android app using Jetpack Compose.
 
