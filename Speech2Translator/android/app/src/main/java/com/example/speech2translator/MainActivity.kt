@@ -49,14 +49,13 @@ fun SpeechTranslatorScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // State variables
     var inputText by remember { mutableStateOf("") }
     var resultText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var isListening by remember { mutableStateOf(false) }
     var statusText by remember { mutableStateOf("Press 'Start Speaking' to dictate") }
 
-    // Speech Recognizer Setup
+    // recognizer setup
     val speechRecognizer = remember { SpeechRecognizer.createSpeechRecognizer(context) }
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -76,11 +75,9 @@ fun SpeechTranslatorScreen() {
                     val spokenText = matches[0]
                     inputText = spokenText
 
-                    // --- AUTO TRANSLATE LOGIC ---
                     isLoading = true
                     statusText = "Translating..."
 
-                    // Launch coroutine to do network call
                     scope.launch {
                         resultText = translateText(spokenText)
                         isLoading = false
@@ -135,7 +132,7 @@ fun SpeechTranslatorScreen() {
         }
     }
 
-    // UI Layout
+    // UI layout
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -157,7 +154,6 @@ fun SpeechTranslatorScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Mic Button
         Button(
             onClick = {
                 if (ContextCompat.checkSelfPermission(
@@ -192,7 +188,6 @@ fun SpeechTranslatorScreen() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // English Text Label (Replaced the Input Field)
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = "Recognized English:",
@@ -209,7 +204,6 @@ fun SpeechTranslatorScreen() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Loading Indicator OR Result Card
         if (isLoading) {
             CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.primary,
