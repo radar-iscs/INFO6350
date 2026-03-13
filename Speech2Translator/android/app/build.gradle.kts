@@ -1,3 +1,12 @@
+import java.util.Properties
+
+// load local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -17,6 +26,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val clientId = localProperties.getProperty("WEB_CLIENT_ID") ?: ""
+        buildConfigField("String", "WEB_CLIENT_ID", "\"$clientId\"")
     }
 
     buildTypes {
@@ -34,10 +46,22 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
+    // Android Credential Manager
+    implementation("androidx.credentials:credentials:1.2.2")
+    // Google Sign-In integration for Credential Manager
+    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
+    // To parse the Google ID Token
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    // ViewModel Compose integration
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    // Retrofit & Gson
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation(libs.androidx.core.ktx)
