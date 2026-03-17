@@ -19,7 +19,7 @@ fun TranslatorScreen(apiKey: String) {
 
     val scope = rememberCoroutineScope()
 
-    // Initialize the Gemini Model
+    // initialize the Gemini Model
     val generativeModel = remember {
         GenerativeModel(
             modelName = "gemini-2.5-flash",
@@ -56,11 +56,9 @@ fun TranslatorScreen(apiKey: String) {
                     isLoading = true
                     scope.launch {
                         try {
-                            // Prompt engineering for accurate translation
                             val prompt = "Translate the following English text to Simplified Chinese. Only output the translated text and nothing else:\n$inputText"
                             val response = generativeModel.generateContent(prompt)
 
-                            // .trim() removes any accidental whitespace Gemini might add
                             resultText = response.text?.trim() ?: "Translation failed."
                         } catch (e: Exception) {
                             Log.e("TranslateApp", "Error", e)

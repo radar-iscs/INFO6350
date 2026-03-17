@@ -171,7 +171,6 @@ def translate_text():
 
         text_to_translate = data['text']
         
-        # Prompt engineering: Give Gemini a clear, explicit instruction
         prompt = f"Translate the following English text to Simplified Chinese. Only output the translated text and nothing else:\n{text_to_translate}"
         
         response = model.generate_content(prompt)
