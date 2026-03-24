@@ -17,13 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
-fun SpeechTranslatorScreen(user: UserProfile, onLogout: () -> Unit) {
-    val context = LocalContext.current
+fun SpeechTranslatorScreen(user: UserProfile, isOnline: Boolean, onLogout: () -> Unit) {    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     var inputText by remember { mutableStateOf("") }
@@ -126,15 +130,35 @@ fun SpeechTranslatorScreen(user: UserProfile, onLogout: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            TextButton(onClick = onLogout) {
-                Text("Logout", color = MaterialTheme.colorScheme.error)
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(12.dp)
+                        .clip(CircleShape)
+                        .background(if (isOnline) Color.Green else Color.Red)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (isOnline) "Online" else "Offline",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isOnline) Color.Green else Color.Red
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                TextButton(onClick = onLogout) {
+                    Text("Logout", color = MaterialTheme.colorScheme.error)
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
         Text(text = "Speech → Chinese", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = statusText, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+
+        val currentStatusText = if (!isOnline) "Waiting for network..." else statusText
+        Text(text = currentStatusText, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
@@ -156,7 +180,7 @@ fun SpeechTranslatorScreen(user: UserProfile, onLogout: () -> Unit) {
                     }
                 }
             },
-            enabled = !isLoading,
+            enabled = !isLoading && isOnline,
             modifier = Modifier.fillMaxWidth().height(50.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (isListening) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary

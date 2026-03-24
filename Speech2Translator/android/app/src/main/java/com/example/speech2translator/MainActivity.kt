@@ -33,8 +33,11 @@ fun MainAppScreen() {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+    val isOnline by rememberNetworkConnectivityState()
+
     if (currentUser == null) {
         LoginScreen(
+            isOnline = isOnline,
             onLoginSuccess = { name, email, idToken ->
                 currentUser = UserProfile(name, email, idToken)
             }
@@ -42,6 +45,7 @@ fun MainAppScreen() {
     } else {
         SpeechTranslatorScreen(
             user = currentUser!!,
+            isOnline = isOnline,
             onLogout = {
                 coroutineScope.launch {
                     try {

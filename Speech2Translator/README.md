@@ -11,6 +11,14 @@ python3 app.py
 
 ## Screenshot
 
-- Test with Android Application
+- Test with Login Screen
 
-  ![App Screenshot](assets/app.gif)
+  ![App Screenshot](assets/login_screen.gif)
+
+- Test with Translator Screen
+
+  ![App Screenshot](assets/translator_screen.gif)
+
+<!-- - Test with Android Application
+
+  ![App Screenshot](assets/app.gif) -->

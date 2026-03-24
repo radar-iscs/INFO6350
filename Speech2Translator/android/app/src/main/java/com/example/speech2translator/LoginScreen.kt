@@ -20,7 +20,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingExcept
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(onLoginSuccess: (String, String, String) -> Unit) {
+fun LoginScreen(isOnline: Boolean, onLoginSuccess: (String, String, String) -> Unit) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -33,6 +33,11 @@ fun LoginScreen(onLoginSuccess: (String, String, String) -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
         Text("You must be logged in to use the translator.", textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(32.dp))
+
+        if (!isOnline) {
+            Text("No internet connection. Waiting for network...", color = MaterialTheme.colorScheme.error)
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         Button(
             onClick = {
@@ -71,6 +76,7 @@ fun LoginScreen(onLoginSuccess: (String, String, String) -> Unit) {
                     }
                 }
             },
+            enabled = isOnline,
             modifier = Modifier.fillMaxWidth().height(50.dp)
         ) {
             Text("Sign in with Google")
