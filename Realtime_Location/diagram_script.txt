@@ -1,0 +1,15 @@
+
+    View(LocationScreen)->>ViewModel(LocationViewModel): user grants permission: startTracking()
+    ViewModel(LocationViewModel)->>Model(LocationRepository): request flow: getLocationUpdates
+    Model(LocationRepository)->>API: requestLocationUpdates()
+    
+    loop Every 3 Seconds
+        API-->>Model(LocationRepository): onLocationResult(Location)
+        Model(LocationRepository)-->>ViewModel(LocationViewModel): stream: emit(LocationModel)
+        ViewModel(LocationViewModel)-->>View(LocationScreen): state flow updates
+        View(LocationScreen)-->>View(LocationScreen): map camera smoothly animates to new location
+    end
+    
+    View(LocationScreen)->>ViewModel(LocationViewModel): user leaves screen
+    ViewModel(LocationViewModel)->>Model(LocationRepository): cancel flow collection
+    Model(LocationRepository)->>API: removeLocationUpdates()
