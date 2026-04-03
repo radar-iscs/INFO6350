@@ -1,0 +1,2 @@
+rootProject.name = 'Realtime_location'
+include ':app'
