@@ -1,8 +1,13 @@
-# Bluetooth - Jetpack Compose
+# QR code - Jetpack Compose
 
-A simple Bluetooth Controlling App using Jetpack Compose.
-
+Two simple QR generator/scanner using Compose.
 
 ## Screenshot
 
-  ![App Screenshot](assets/app.gif)
+- Test with the generator
+
+  ![App Screenshot](assets/generate.gif)
+
+- Test with the scanner
+
+  ![App Screenshot](assets/scan.gif)
