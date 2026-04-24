@@ -18,12 +18,7 @@ import androidx.core.content.ContextCompat
 import com.example.sms.ui.ReceiveSmsActivity
 import com.example.sms.ui.SendSmsActivity
 
-/**
- * Main launcher activity — requests permissions and shows navigation buttons
- */
 class MainActivity : ComponentActivity() {
-
-    // Modern permission launcher (replaces onRequestPermissionsResult)
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { results ->
@@ -38,7 +33,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Request permissions on launch if not already granted
         if (!checkSmsPermissions()) {
             permissionLauncher.launch(
                 arrayOf(

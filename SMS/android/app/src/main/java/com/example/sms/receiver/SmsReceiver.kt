@@ -7,7 +7,6 @@ import android.provider.Telephony
 import com.example.sms.ui.ReceiveSmsActivity
 import com.example.sms.utils.NotificationHelper
 
-
 class SmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
