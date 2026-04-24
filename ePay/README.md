@@ -26,7 +26,7 @@ A minimal MVVM payments app. Android app collects amount/note, Flask creates a S
 
 ## Architecture
 
-![App Screenshot](assets/Architecture%20Diagram.png)
+<img src="assets/Architecture%20Diagram.png" alt="App Screenshot" width="300">
 
 ## Run
 ```bash
