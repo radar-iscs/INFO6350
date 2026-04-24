@@ -65,6 +65,8 @@ class PaymentRepository(
         }
     }
 
+    suspend fun clearAll() = withContext(Dispatchers.IO) { dao.clear() }
+
     private suspend fun findById(id: String): TransactionEntity? =
         dao.findById(id)
 }

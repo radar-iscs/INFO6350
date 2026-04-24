@@ -27,6 +27,9 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions WHERE paymentIntentId = :id LIMIT 1")
     suspend fun findById(id: String): TransactionEntity?
+
+    @Query("DELETE FROM transactions")
+    suspend fun clear()
 }
 
 @Database(entities = [TransactionEntity::class], version = 1, exportSchema = false)

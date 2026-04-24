@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,17 +21,20 @@ import com.example.epay.data.TransactionEntity
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class HistoryViewModel(repo: PaymentRepository) : ViewModel() {
+class HistoryViewModel(private val repo: PaymentRepository) : ViewModel() {
     val transactions: StateFlow<List<TransactionEntity>> =
         repo.observeTransactions().stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
+
+    fun clearAll() = viewModelScope.launch { repo.clearAll() }
 }
 
 class HistoryVmFactory(private val repo: PaymentRepository) : ViewModelProvider.Factory {
@@ -50,6 +54,11 @@ fun HistoryScreen(repository: PaymentRepository, onBack: () -> Unit) {
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                }
+            },
+            actions = {
+                IconButton(onClick = { vm.clearAll() }) {
+                    Icon(Icons.Default.Delete, "Clear All")
                 }
             }
         )
