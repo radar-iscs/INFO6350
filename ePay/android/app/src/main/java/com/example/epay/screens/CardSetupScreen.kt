@@ -118,7 +118,7 @@ fun CardSetupScreen(
             )
             OutlinedTextField(
                 value = state.email, onValueChange = vm::onEmail,
-                label = { Text("Email (you can change this)") },
+                label = { Text("Email") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
